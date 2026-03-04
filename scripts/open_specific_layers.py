@@ -21,9 +21,11 @@
 #                     |—— figures
 #         |—— scripts
 # SOURCES : GoogleIA (pour apprendre le Python)
-# NOTES : 
+
+# NOTES : Imperfections : n'atterissent pas à leur emplacement final.
+
 # LEXIQUE :
-#
+
 ##########################################################################-
 
 
@@ -45,29 +47,32 @@ dossier_styles = "/Users/Aliz/Desktop/QGIS/_Connectivite_PhD/Mergin/styles"
 nom_groupe = "nepasmodifier_couchesConnectivite"
 
 # # 1. Liste des exceptions (fichiers à NE PAS charger)
-# exceptions = ["PRO_point (conflicted copy, AGirard v90).shp", "PRO_repérage_zones_experimentales.shp"]
+exceptions = ["PRO_point (conflicted copy, AGirard v90).shp", "PRO_repérage_zones_experimentales.shp"]
 # 
 # # 2. Liste de couches spécifiques (hors pattern PRO_)
-couches_specifiques = ["Ecotone.restauration.zone.pt.shp"]
+couches_specifiques = [] # "Ecotone.restauration.zone.pt.shp"
 
 # # 3. Liste des fichiers à rechercher ~ [site.UID]_*.shp
 prefixes = ["STH", "PRO"] # ajouter ici si autres
+extensions = ["*.shp", "*.gpkg"]
+
 tous_les_fichiers = []
 # 2. Boucle pour chercher chaque préfixe
 for p in prefixes:
-    # On crée le pattern dynamique, ex: "*STH_*.shp" puis "*PRO_*.shp"
-    pattern = os.path.join(dossier_couches, f"*{p}_*.shp") # f-string (f"*{p}_*.shp"): le f devant les guillemets 
-    # permet d'insérer directement la variable {p} dans la chaîne de texte. C'est très lisible et pratique pour
-    # construire des noms de fichiers dynamiquement.
-    
-    # On ajoute les résultats à notre liste globale
-    tous_les_fichiers.extend(glob.glob(pattern)) # suffixe .extend dit d'ajouter "platement" les sites à 
-    # l'opposé de faire des listes de listes avec append par exemple
+      for ext in extensions:
+        # On crée le pattern dynamique, ex: "*STH_*.shp" puis "*PRO_*.shp"
+        pattern = os.path.join(dossier_couches, f"*{p}_{ext}") # f-string (f"*{p}_*.shp"): le f devant les guillemets 
+        # permet d'insérer directement la variable {p} dans la chaîne de texte. C'est très lisible et pratique pour
+        # construire des noms de fichiers dynamiquement.
+        
+        # On ajoute les résultats à notre liste globale
+        tous_les_fichiers.extend(glob.glob(pattern)) # suffixe .extend dit d'ajouter "platement" les sites à 
+        # l'opposé de faire des listes de listes avec append par exemple
 # ici tous les fichiers vont être nommés l'un à la suite de l'autre ainsi : 
 # > tous_les_fichiers
 # [1] ['/Users/Aliz/Desktop/QGIS/_Connectivite_PhD/Mergin/_Connectitite_PhD_Mergin_26nov24/STH_puits.shp', ...]
 
-print(f"{len(tous_les_fichiers)} fichiers trouvés avec les préfixes {prefixes}")
+print(f"Trouvé : {len(tous_les_fichiers)} fichiers (SHP et GPKG).")
 # ancienne version : recherche d'un seul SITE.UID à la fois 
 # # On prend les [site.UID]_*.shp
 # tous_les_fichiers = glob.glob(os.path.join(dossier_couches, "*STH_*.shp"))
