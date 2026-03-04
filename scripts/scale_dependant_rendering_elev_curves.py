@@ -9,7 +9,7 @@
 # Date création initiale : 2025-02-11
 # Date mise à jour : 
 # Pourquoi : 1ier essai -> courbes de niveau ~ échelle
-# SOURCES : moi-même
+# SOURCES : 
 # NOTES : 
 # LEXIQUE :
 #
