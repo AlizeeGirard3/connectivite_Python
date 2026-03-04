@@ -88,5 +88,3 @@ else:
     print("Courbes générées et style d'étiquette appliqué !")
 
 
-
-
