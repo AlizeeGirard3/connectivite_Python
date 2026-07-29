@@ -1,5 +1,5 @@
-# ## 4 mars 2026
-# ## recouper les lits d'écoul pot (MRNF, 2025) au sud de la rivière Etchemin
+## 4 mars 2026
+## recouper les lits d'écoul pot (MRNF, 2025) au sud de la rivière Etchemin
 ## version finale
 
 import processing

@@ -77,5 +77,5 @@ else:
 
     # 4. SAUVEGARDE DU NOUVEAU MODÈLE
     layer.saveNamedStyle(output_qml)
-    print(f"Modèle intelligent sauvegardé ici : {output_qml}")
+    print(f"Modèle intelligent sauvegardé ici : {output_qml}") # f-string = effectuer calcul dans l'accolade directement insérés dans la chaîne de texte
 
