@@ -23,61 +23,6 @@ from qgis.core import (QgsProject, QgsRasterBandStats, QgsRasterShader,
 # ============================================================================= /
 # Exécution ----
 # ============================================================================= /
-# # 1. Accéder au projet et au style par défaut de QGIS
-# project = QgsProject.instance()
-# style = QgsStyle.defaultStyle()
-# # Vous pouvez changer 'Spectral' par 'Viridis', 'Magma', 'Terrain', etc.
-# base_ramp = style.colorRamp('Spectral') 
-# base_ramp.invert() # Optionnel : Inverser pour avoir le rouge en haute altitude
-# 
-# count = 0
-# 
-# # 2. Boucle sur toutes les couches du projet
-# for layer in project.mapLayers().values():
-#   # On vérifie si c'est un Raster ET si "MNT" est dans le nom
-#     if layer.type() == QgsMapLayer.RasterLayer and "MNT" in layer.name().upper():
-#         provider = layer.dataProvider() # Sans le dataProvider(), QGIS saurait qu'une couche existe dans la légende, 
-#         # mais il ne pourrait pas "voir" ce qu'il y a dedans.
-#         band = 1
-#         
-#         # 1. Stats
-#         stats = provider.bandStatistics(1, QgsRasterBandStats.All, layer.extent())
-#         v_min, v_max = stats.minimumValue, stats.maximumValue
-#         nb_classes = int(v_max - v_min) + 1
-#         
-#              # 2. Créer la liste des items de couleur manuellement (Plus robuste)
-#         color_items = []
-#         for i in range(nb_classes):
-#             val = v_min + i
-#             # Calcul du ratio (0.0 à 1.0) pour la couleur
-#             ratio = (val - v_min) / (v_max - v_min) if v_max > v_min else 0
-#             color = base_ramp.color(ratio)
-#             color_items.append(QgsColorRampShader.ColorRampItem(val, color, f"{int(val)} m"))
-#             
-#             # On utilise la méthode la plus stable pour la rampe
-#             shader_fcn = QgsColorRampShader()
-#             shader_fcn.setColorRampType(QgsColorRampShader.Interpolated)
-#             shader_fcn.setColorRampItemList(color_items) # <--- On injecte la liste directement
-#             raster_shader = QgsRasterShader()
-#             raster_shader.setRasterShaderFunction(shader_fcn)
-#             # 3. Renderer
-#             renderer = QgsSingleBandPseudoColorRenderer(provider, 1, raster_shader)
-#             layer.setRenderer(renderer)
-#             layer.triggerRepaint()
-#             
-#             count += 1
-#             print(f"Mise à jour : {layer.name()} | Min: {v_min:.2f} | Max: {v_max:.2f}")
-#         
-#         # 4. Rafraîchir la légende
-#         iface.layerTreeView().refreshLayerSymbology('')
-#         print(f"Terminé : {count} couches MNT mises à jour.")
-
-
-
-from qgis.core import (QgsProject, QgsRasterBandStats, QgsRasterShader, 
-                       QgsColorRampShader, QgsSingleBandPseudoColorRenderer, 
-                       QgsStyle, QgsColorRamp)
-
 # --- 1. INITIALISATION DU STYLE ---
 style = QgsStyle.defaultStyle()
 base_ramp = style.colorRamp('Spectral')
@@ -98,7 +43,7 @@ lidar_grp = find_group_insensitive(root, "LiDAR")
 sth_grp = find_group_insensitive(lidar_grp, "PRO") if lidar_grp else None
 mnt_grp = find_group_insensitive(sth_grp, "MNT") if sth_grp else None
 
-layers_to_style = []
+layers_to_style = [] # liste vide nommée layers_to_style
 
 if mnt_grp:
     for child in mnt_grp.children():
@@ -113,7 +58,7 @@ if not layers_to_style:
     print("Erreur : Aucune couche raster 'MNT' trouvée dans LiDAR/PRO/MNT.")
 else:
     # Calcul du Min/Max Global
-    global_min = float('inf')
+    global_min = float('inf') # float() convertit l'élément (texte, entier...) en nombre à virgule
     global_max = float('-inf')
     
     print(f"Calcul des stats pour {len(layers_to_style)} couches...")
@@ -145,7 +90,7 @@ else:
         renderer.setClassificationMax(global_max)
         
         layer.setRenderer(renderer)
-        layer.setOpacity(0.8) # Règle la transparence à 50%
+        layer.setOpacity(0.8) # Règle la transparence à 80%
         layer.triggerRepaint()
 
     iface.layerTreeView().refreshLayerSymbology('')
