@@ -4,10 +4,12 @@
 
 # Description -------------------------------------------------------------
 ##########################################################################-
-# Fait par : Alizée Girard
+# Fait par : Alizée Girard (forte implication de Google IA, j'apprends le Python)
 # Affiliation :   ULaval
 # Date création initiale : 2025-03-10
 # Date mise à jour : 
+# - 2026-08-07: fournir un "chemin" (Path) où chercher plutôt qu'à la racine du projet QGIS automatiquement; 
+# pour ce faire, choisir les lignes à rouler (ne fonctionne pas si le script est roulé en entier)
 # Pourquoi : Obtenir en un clin d'oeil les plages d'étendue d'altitude à partir du MNT
 # de MRNF (2026), tirées de Données Québec
 # LEXIQUE : 
@@ -28,30 +30,70 @@ style = QgsStyle.defaultStyle()
 base_ramp = style.colorRamp('Spectral')
 base_ramp.invert() 
 
-# --- 2. ACCÈS À LA HIÉRARCHIE DES DOSSIERS ---
-root = QgsProject.instance().layerTreeRoot()
-
-def find_group_insensitive(parent, name):
-    """Cherche un groupe sans tenir compte de la casse"""
-    for child in parent.children():
-        if child.nodeType() == QgsLayerTreeNode.NodeGroup and child.name().upper() == name.upper():
-            return child
-    return None
-
-# On descend la hiérarchie : LiDAR -> STH -> MNT
-lidar_grp = find_group_insensitive(root, "LiDAR")
-sth_grp = find_group_insensitive(lidar_grp, "PRO") if lidar_grp else None
-mnt_grp = find_group_insensitive(sth_grp, "MNT") if sth_grp else None
-
 layers_to_style = [] # liste vide nommée layers_to_style
 
-if mnt_grp:
-    for child in mnt_grp.children():
-        layer = child.layer()
-        # On vérifie si c'est un Raster et si le nom contient MNT (ou MTN)
-        if layer and layer.type() == QgsMapLayer.RasterLayer:
-            if "MNT" in layer.name().upper() or "MTN" in layer.name().upper():
-                layers_to_style.append(layer)
+
+# CHOIX (2.i ou 2.ii) ---------------------------------------------
+
+
+# --- 2.i ACCÈS AU DOSSIER SPÉCIFIQUE ---
+# COMMENT/UNCOMMENT HERE (next line) ---------------------------------------------
+# DOSSIER_MNT = Path("/Users/Aliz/Desktop/QGIS/DONNÉES QUÉBEC/Diffusion2/Imagerie/Produits_derives_LiDAR/22C/22C07SO")
+# 
+# 
+# if DOSSIER_MNT.exists():
+#     for chemin_fichier in DOSSIER_MNT.glob("*.tif"):
+#         nom_fichier = chemin_fichier.stem
+#         # On vérifie si le nom contient MNT (ou MTN)
+#         if "MNT" in nom_fichier.upper() or "MTN" in nom_fichier.upper():
+#             
+#             # Récupère la couche si elle est déjà ouverte dans QGIS, sinon la charge
+#             couches_existantes = QgsProject.instance().mapLayersByName(nom_fichier)
+#             if couches_existantes:
+#                 layer = couches_existantes[0]
+#             else:
+#                 layer = QgsRasterLayer(str(chemin_fichier), nom_fichier)
+#                 if layer.isValid():
+#                     QgsProject.instance().addMapLayer(layer)
+#                 else:
+#                     continue
+#                     
+#             layers_to_style.append(layer)
+# COMMENT/UNCOMMENT HERE (previous line) ---------------------------------------------
+
+            
+# OU ---------------------------------------------
+
+# --- 2.ii ACCÈS À LA HIÉRARCHIE DES DOSSIERS ---
+# COMMENT/UNCOMMENT HERE (next line) ---------------------------------------------
+# root = QgsProject.instance().layerTreeRoot()
+# 
+# def find_group_insensitive(parent, name):
+#     """Cherche un groupe sans tenir compte de la casse"""
+#     for child in parent.children():
+#         if child.nodeType() == QgsLayerTreeNode.NodeGroup and child.name().upper() == name.upper():
+#             return child
+#     return None
+# 
+# # On descend la hiérarchie : LiDAR -> SITE.UID -> MNT
+# lidar_grp = find_group_insensitive(root, "LiDAR")
+# sth_grp = find_group_insensitive(lidar_grp, "PRO") if lidar_grp else None
+# mnt_grp = find_group_insensitive(sth_grp, "MNT") if sth_grp else None
+# 
+# if mnt_grp:
+#     for child in mnt_grp.children():
+#         layer = child.layer()
+#         # On vérifie si c'est un Raster et si le nom contient MNT (ou MTN)
+#         if layer and layer.type() == QgsMapLayer.RasterLayer:
+#             if "MNT" in layer.name().upper() or "MTN" in layer.name().upper():
+#                 layers_to_style.append(layer)
+# COMMENT/UNCOMMENT HERE (previous line) ---------------------------------------------
+
+
+
+# POURSUIVRE CODE COMMUN ---------------------------------------------
+
+
 
 # --- 3. CALCUL ET APPLICATION ---
 if not layers_to_style:
